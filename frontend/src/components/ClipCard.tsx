@@ -10,9 +10,35 @@ interface ClipCardProps {
 }
 
 export const ClipCard: React.FC<ClipCardProps> = ({ clip, index }) => {
-  const handlePlayAudio = () => {
-    // In a real app, you'd implement audio playback here
-    console.log('Play audio for clip:', clip.id);
+  const handlePlayAudio = async () => {
+    try {
+      console.log('Play audio for clip:', clip.id);
+      
+      // Create audio element and play the audio file from backend
+      const audio = new Audio(`http://localhost:8000/audio/${clip.id}`);
+      
+      // Add event listeners for better user experience
+      audio.addEventListener('loadstart', () => {
+        console.log('Loading audio...');
+      });
+      
+      audio.addEventListener('canplay', () => {
+        console.log('Audio ready to play');
+        audio.play();
+      });
+      
+      audio.addEventListener('error', (e) => {
+        console.error('Error playing audio:', e);
+        alert('Failed to play audio. Please try again.');
+      });
+      
+      // Load the audio
+      audio.load();
+      
+    } catch (error) {
+      console.error('Error playing audio:', error);
+      alert('Failed to play audio. Please try again.');
+    }
   };
 
   return (
