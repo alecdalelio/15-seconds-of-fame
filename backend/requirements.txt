@@ -4,3 +4,7 @@ pydantic==2.5.0
 python-multipart==0.0.6
 requests==2.31.0
 typing-extensions==4.8.0
+yt-dlp==2023.12.30
+pydub==0.25.1
+openai-whisper==20231117
+ffmpeg-python==0.2.0
