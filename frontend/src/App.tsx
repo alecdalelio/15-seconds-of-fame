@@ -5,7 +5,8 @@ import { ClipLibrary } from './components/ClipLibrary';
 import { MediaProvider } from './contexts/MediaContext';
 import type { Clip } from './types/api';
 import { loadSavedClips, addClipToStorage, removeClipFromStorage, clearAllClips } from './utils/storage';
-import { SparklesIcon, VideoCameraIcon, BookOpenIcon } from '@heroicons/react/24/outline';
+import { VideoCameraIcon, BookOpenIcon } from '@heroicons/react/24/outline';
+import Logo from './components/Logo';
 import './App.css';
 
 // Create a client
@@ -39,12 +40,7 @@ function App() {
               <div className="flex justify-between h-16 sm:h-20">
                 <div className="flex items-center">
                   <div className="flex items-center space-x-3">
-                    <div className="relative">
-                      <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center shadow-glow">
-                        <SparklesIcon className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-accent-500 rounded-full animate-pulse-slow"></div>
-                    </div>
+                    <Logo size={24} variant="light" gap={false} ariaLabel="15 Seconds of Fame" />
                     <div>
                       <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
                         15 Seconds of Fame

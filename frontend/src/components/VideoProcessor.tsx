@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { PlayIcon, XMarkIcon, SparklesIcon, VideoCameraIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
+import { PlayIcon, XMarkIcon, VideoCameraIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
+import Logo from './Logo';
 import { useVideoProcessing } from '../hooks/useVideoProcessing';
 import { isValidYouTubeUrl } from '../utils/validation';
 import { ProcessingStatus } from './ProcessingStatus';
@@ -108,9 +109,7 @@ export const VideoProcessor: React.FC<VideoProcessorProps> = ({
       {/* Hero Section */}
       <div className="text-center space-y-4">
         <div className="flex items-center justify-center space-x-3 mb-6">
-          <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl flex items-center justify-center shadow-glow">
-            <SparklesIcon className="w-8 h-8 text-white" />
-          </div>
+          <Logo size={64} variant="light" gap={false} />
           <div className="text-left">
             <h1 className="text-3xl sm:text-4xl font-bold gradient-text">
               Create Viral Clips
@@ -197,7 +196,7 @@ export const VideoProcessor: React.FC<VideoProcessorProps> = ({
           <div className="flex items-center justify-between">
             <div className="space-y-2">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center space-x-3">
-                <SparklesIcon className="w-6 h-6 text-primary-500" />
+                <Logo size={24} variant="light" gap={false} />
                 <span>Your Viral Clips</span>
                 <span className="text-lg text-gray-500">({currentVideoResults.length} clips)</span>
               </h2>
