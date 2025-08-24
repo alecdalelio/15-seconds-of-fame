@@ -1,23 +1,25 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 interface MediaManager {
   playAudio: (clipId: string, audioUrl: string) => void;
   playVideo: (clipId: string, videoElement: HTMLVideoElement) => void;
   stopAllMedia: () => void;
   getCurrentlyPlaying: () => { type: 'audio' | 'video' | null; clipId: string | null };
+  cleanup: () => void;
 }
 
 export const useMediaManager = (): MediaManager => {
   const currentAudioRef = useRef<HTMLAudioElement | null>(null);
   const currentVideoRef = useRef<HTMLVideoElement | null>(null);
-  const currentClipIdRef = useRef<string | null>(null);
-  const currentMediaTypeRef = useRef<'audio' | 'video' | null>(null);
+  const [currentClipId, setCurrentClipId] = useState<string | null>(null);
+  const [currentMediaType, setCurrentMediaType] = useState<'audio' | 'video' | null>(null);
 
   const stopAllMedia = useCallback(() => {
     // Stop current audio
     if (currentAudioRef.current) {
       currentAudioRef.current.pause();
       currentAudioRef.current.currentTime = 0;
+      currentAudioRef.current.src = '';
       currentAudioRef.current = null;
     }
 
@@ -28,11 +30,24 @@ export const useMediaManager = (): MediaManager => {
       currentVideoRef.current = null;
     }
 
-    currentClipIdRef.current = null;
-    currentMediaTypeRef.current = null;
+    setCurrentClipId(null);
+    setCurrentMediaType(null);
   }, []);
 
   const playAudio = useCallback((clipId: string, audioUrl: string) => {
+    // If the same clip is already playing, stop it and return
+    if (currentClipId === clipId && currentMediaType === 'audio') {
+      if (currentAudioRef.current) {
+        currentAudioRef.current.pause();
+        currentAudioRef.current.currentTime = 0;
+        currentAudioRef.current.src = '';
+        currentAudioRef.current = null;
+      }
+      setCurrentClipId(null);
+      setCurrentMediaType(null);
+      return;
+    }
+
     // Stop any currently playing media
     stopAllMedia();
 
@@ -53,30 +68,30 @@ export const useMediaManager = (): MediaManager => {
     
     audio.addEventListener('ended', () => {
       console.log('Audio finished for clip:', clipId);
-      if (currentClipIdRef.current === clipId && currentMediaTypeRef.current === 'audio') {
+      if (currentClipId === clipId && currentMediaType === 'audio') {
         currentAudioRef.current = null;
-        currentClipIdRef.current = null;
-        currentMediaTypeRef.current = null;
+        setCurrentClipId(null);
+        setCurrentMediaType(null);
       }
     });
     
     audio.addEventListener('error', (e) => {
       console.error('Error playing audio for clip:', clipId, e);
-      if (currentClipIdRef.current === clipId && currentMediaTypeRef.current === 'audio') {
+      if (currentClipId === clipId && currentMediaType === 'audio') {
         currentAudioRef.current = null;
-        currentClipIdRef.current = null;
-        currentMediaTypeRef.current = null;
+        setCurrentClipId(null);
+        setCurrentMediaType(null);
       }
     });
     
     // Set current media
     currentAudioRef.current = audio;
-    currentClipIdRef.current = clipId;
-    currentMediaTypeRef.current = 'audio';
+    setCurrentClipId(clipId);
+    setCurrentMediaType('audio');
     
     // Load and play
     audio.load();
-  }, [stopAllMedia]);
+  }, [stopAllMedia, currentClipId, currentMediaType]);
 
   const playVideo = useCallback((clipId: string, videoElement: HTMLVideoElement) => {
     // Stop any currently playing media
@@ -84,15 +99,15 @@ export const useMediaManager = (): MediaManager => {
 
     // Set current media
     currentVideoRef.current = videoElement;
-    currentClipIdRef.current = clipId;
-    currentMediaTypeRef.current = 'video';
+    setCurrentClipId(clipId);
+    setCurrentMediaType('video');
 
     // Add event listeners to track when video ends
     const handleEnded = () => {
-      if (currentClipIdRef.current === clipId && currentMediaTypeRef.current === 'video') {
+      if (currentClipId === clipId && currentMediaType === 'video') {
         currentVideoRef.current = null;
-        currentClipIdRef.current = null;
-        currentMediaTypeRef.current = null;
+        setCurrentClipId(null);
+        setCurrentMediaType(null);
       }
     };
 
@@ -101,25 +116,30 @@ export const useMediaManager = (): MediaManager => {
     // Play the video
     videoElement.play().catch(error => {
       console.error('Error playing video for clip:', clipId, error);
-      if (currentClipIdRef.current === clipId && currentMediaTypeRef.current === 'video') {
+      if (currentClipId === clipId && currentMediaType === 'video') {
         currentVideoRef.current = null;
-        currentClipIdRef.current = null;
-        currentMediaTypeRef.current = null;
+        setCurrentClipId(null);
+        setCurrentMediaType(null);
       }
     });
-  }, [stopAllMedia]);
+  }, [stopAllMedia, currentClipId, currentMediaType]);
 
   const getCurrentlyPlaying = useCallback(() => {
     return {
-      type: currentMediaTypeRef.current,
-      clipId: currentClipIdRef.current
+      type: currentMediaType,
+      clipId: currentClipId
     };
-  }, []);
+  }, [currentMediaType, currentClipId]);
+
+  const cleanup = useCallback(() => {
+    stopAllMedia();
+  }, [stopAllMedia]);
 
   return {
     playAudio,
     playVideo,
     stopAllMedia,
-    getCurrentlyPlaying
+    getCurrentlyPlaying,
+    cleanup
   };
 };

@@ -6,6 +6,7 @@ interface MediaContextType {
   playVideo: (clipId: string, videoElement: HTMLVideoElement) => void;
   stopAllMedia: () => void;
   getCurrentlyPlaying: () => { type: 'audio' | 'video' | null; clipId: string | null };
+  cleanup: () => void;
 }
 
 const MediaContext = createContext<MediaContextType | null>(null);

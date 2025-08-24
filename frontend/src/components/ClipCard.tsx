@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { PlayIcon, ClockIcon, ChevronDownIcon, ChevronUpIcon, HeartIcon, VideoCameraIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import { PlayIcon, StopIcon, ClockIcon, ChevronDownIcon, ChevronUpIcon, HeartIcon, VideoCameraIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import type { Clip } from '../types/api';
 import { ScoreDisplay } from './ScoreDisplay';
 import { ViralAnalysisDisplay } from './ViralAnalysisDisplay';
@@ -178,12 +178,16 @@ export const ClipCard: React.FC<ClipCardProps> = ({ clip, index, onSaveToLibrary
                     : 'text-primary-600 hover:text-primary-700 hover:bg-primary-50'
                 }`}
               >
-                <PlayIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                {isThisClipPlaying && currentlyPlaying.type === 'audio' ? (
+                  <StopIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                ) : (
+                  <PlayIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                )}
                 <span className="hidden sm:inline">
-                  {isThisClipPlaying && currentlyPlaying.type === 'audio' ? 'Playing Audio' : 'Play Audio'}
+                  {isThisClipPlaying && currentlyPlaying.type === 'audio' ? 'Stop Audio' : 'Play Audio'}
                 </span>
                 <span className="sm:hidden">
-                  {isThisClipPlaying && currentlyPlaying.type === 'audio' ? 'Playing' : 'Audio'}
+                  {isThisClipPlaying && currentlyPlaying.type === 'audio' ? 'Stop' : 'Audio'}
                 </span>
               </button>
               
