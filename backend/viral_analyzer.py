@@ -23,6 +23,8 @@ class ViralAnalysis:
     educational_value: float
     entertainment_factor: float
     viral_reasoning: str
+    clip_title: str
+    suggested_caption: str
     combined_score: float
 
 @dataclass
@@ -145,6 +147,8 @@ Provide a JSON response with the following structure:
     "educational_value": <1-10, learning potential>,
     "entertainment_factor": <1-10, pure entertainment value>,
     "viral_reasoning": "<detailed explanation of viral potential>",
+    "clip_title": "<catchy, descriptive title for this clip (max 60 chars)>",
+    "suggested_caption": "<engaging social media caption with relevant hashtags (max 200 chars)>",
     "combined_score": <1-10, weighted combination>
 }}
 
@@ -155,6 +159,17 @@ Scoring guidelines:
 - Relatability: Universal appeal and everyday relevance
 - Educational Value: Learning potential and insights provided
 - Entertainment Factor: Pure entertainment and engagement value
+
+Title guidelines:
+- Create a catchy, descriptive title that captures the essence
+- Use action words and emotional triggers
+- Keep it under 60 characters for social media
+
+Caption guidelines:
+- Write an engaging caption that would work on TikTok, Instagram, or LinkedIn
+- Include 2-3 relevant hashtags
+- Make it shareable and relatable
+- Keep it under 200 characters
 
 Keep the viral_reasoning concise but insightful (max 200 words).
 Respond with ONLY the JSON object, no additional text.
@@ -211,6 +226,8 @@ Respond with ONLY the JSON object, no additional text.
             entertainment_factor = self._validate_score(data.get("entertainment_factor", 5.0))
             
             viral_reasoning = data.get("viral_reasoning", "Analysis not available")
+            clip_title = data.get("clip_title", "Viral Clip")
+            suggested_caption = data.get("suggested_caption", "Check out this viral moment!")
             
             # Calculate combined score (weighted average)
             combined_score = self._calculate_combined_score(
@@ -226,6 +243,8 @@ Respond with ONLY the JSON object, no additional text.
                 educational_value=educational_value,
                 entertainment_factor=entertainment_factor,
                 viral_reasoning=viral_reasoning,
+                clip_title=clip_title,
+                suggested_caption=suggested_caption,
                 combined_score=combined_score
             )
             
@@ -341,6 +360,10 @@ Respond with ONLY the JSON object, no additional text.
         
         reasoning = "Fallback analysis: Basic content scoring applied due to API unavailability."
         
+        # Generate basic title and caption for fallback
+        clip_title = "Viral Moment"
+        suggested_caption = "Check out this viral moment! #viral #content"
+        
         return ViralAnalysis(
             viral_score=scores[0],
             emotional_intensity=scores[1],
@@ -349,6 +372,8 @@ Respond with ONLY the JSON object, no additional text.
             educational_value=scores[4],
             entertainment_factor=scores[5],
             viral_reasoning=reasoning,
+            clip_title=clip_title,
+            suggested_caption=suggested_caption,
             combined_score=combined_score
         )
     

@@ -2,6 +2,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
 import { VideoProcessor } from './components/VideoProcessor';
 import { ClipLibrary } from './components/ClipLibrary';
+import type { Clip } from './types/api';
+import { loadSavedClips, addClipToStorage, removeClipFromStorage, clearAllClips } from './utils/storage';
 import './App.css';
 
 // Create a client
@@ -16,6 +18,9 @@ const queryClient = new QueryClient({
 
 function App() {
   const [currentView, setCurrentView] = useState<'processor' | 'library'>('processor');
+  
+  // Load saved clips from localStorage on component mount
+  const [savedClips, setSavedClips] = useState<Clip[]>(() => loadSavedClips());
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -55,8 +60,32 @@ function App() {
 
         {/* Main Content */}
         <main className="py-8 px-4">
-          {currentView === 'processor' && <VideoProcessor />}
-          {currentView === 'library' && <ClipLibrary />}
+          {currentView === 'processor' && (
+            <VideoProcessor 
+              savedClips={savedClips}
+              onSaveClip={(clip) => {
+                const newClips = addClipToStorage(clip);
+                setSavedClips(newClips);
+              }}
+              onRemoveClip={(clipId) => {
+                const newClips = removeClipFromStorage(clipId);
+                setSavedClips(newClips);
+              }}
+            />
+          )}
+          {currentView === 'library' && (
+            <ClipLibrary 
+              savedClips={savedClips}
+              onRemoveClip={(clipId) => {
+                const newClips = removeClipFromStorage(clipId);
+                setSavedClips(newClips);
+              }}
+              onClearAll={() => {
+                clearAllClips();
+                setSavedClips([]);
+              }}
+            />
+          )}
         </main>
       </div>
     </QueryClientProvider>

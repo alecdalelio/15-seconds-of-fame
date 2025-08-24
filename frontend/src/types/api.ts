@@ -24,6 +24,11 @@ export interface Clip {
   viral_reasoning?: string;
   title?: string;
   duration?: string;
+  suggested_caption?: string;
+  // Clip source
+  ai_generated?: boolean;
+  video_source?: string;
+  video_title?: string;
   // API usage tracking
   api_usage_tokens?: number;
   api_usage_cost?: number;

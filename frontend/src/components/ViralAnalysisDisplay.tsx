@@ -26,25 +26,40 @@ interface ScoreItemProps {
   color: string;
 }
 
-const ScoreItem: React.FC<ScoreItemProps> = ({ label, score, icon: Icon, color }) => (
-  <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
-    <div className="flex items-center gap-2">
-      <Icon className={`h-4 w-4 ${color}`} />
-      <span className="text-sm font-medium text-gray-700">{label}</span>
-    </div>
-    <div className="flex items-center gap-2">
-      <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-        <div 
-          className={`h-full ${color.replace('text-', 'bg-')} transition-all duration-300`}
-          style={{ width: `${(score / 10) * 100}%` }}
-        />
+const ScoreItem: React.FC<ScoreItemProps> = ({ label, score, icon: Icon, color }) => {
+  // Map text colors to background colors
+  const getBgColor = (textColor: string) => {
+    const colorMap: { [key: string]: string } = {
+      'text-red-500': 'bg-red-500',
+      'text-pink-500': 'bg-pink-500',
+      'text-orange-500': 'bg-orange-500',
+      'text-blue-500': 'bg-blue-500',
+      'text-green-500': 'bg-green-500',
+      'text-purple-500': 'bg-purple-500',
+    };
+    return colorMap[textColor] || 'bg-gray-500';
+  };
+
+  return (
+    <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+      <div className="flex items-center gap-2">
+        <Icon className={`h-4 w-4 ${color}`} />
+        <span className="text-sm font-medium text-gray-700">{label}</span>
       </div>
-      <span className="text-sm font-semibold text-gray-900 min-w-[2rem] text-right">
-        {score.toFixed(1)}
-      </span>
+      <div className="flex items-center gap-2">
+        <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div 
+            className={`h-full ${getBgColor(color)} transition-all duration-300`}
+            style={{ width: `${(score / 10) * 100}%` }}
+          />
+        </div>
+        <span className="text-sm font-semibold text-gray-900 min-w-[2rem] text-right">
+          {score.toFixed(1)}
+        </span>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const ViralAnalysisDisplay: React.FC<ViralAnalysisDisplayProps> = ({
   viral_score = 0,

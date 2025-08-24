@@ -7,10 +7,19 @@ import { ErrorMessage } from './ErrorMessage';
 import { ClipCard } from './ClipCard';
 import type { Clip } from '../types/api';
 
-export const VideoProcessor: React.FC = () => {
+interface VideoProcessorProps {
+  savedClips: Clip[];
+  onSaveClip: (clip: Clip) => void;
+  onRemoveClip: (clipId: string) => void;
+}
+
+export const VideoProcessor: React.FC<VideoProcessorProps> = ({ 
+  savedClips, 
+  onSaveClip, 
+  onRemoveClip 
+}) => {
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [urlError, setUrlError] = useState('');
-  
   const videoProcessing = useVideoProcessing();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -37,6 +46,45 @@ export const VideoProcessor: React.FC = () => {
     if (youtubeUrl.trim() && isValidYouTubeUrl(youtubeUrl)) {
       videoProcessing.mutate({ youtube_url: youtubeUrl.trim() });
     }
+  };
+
+  const handleSaveToLibrary = (clip: Clip, index: number) => {
+    // Check if clip is already saved
+    const isAlreadySaved = savedClips.some(savedClip => savedClip.id === clip.id);
+    
+    if (isAlreadySaved) {
+      // Remove from saved clips
+      onRemoveClip(clip.id);
+    } else {
+      // Add to saved clips with enhanced metadata
+      const clipWithMetadata = {
+        ...clip,
+        ai_generated: true,
+        title: clip.title || `Viral Clip ${index + 1}`,
+        duration: `${Math.round(clip.end_time - clip.start_time)}s`,
+        // Use video information from the API response
+        video_source: clip.video_source || youtubeUrl,
+        video_title: clip.video_title || 'Unknown Video',
+        // Preserve all viral analysis data
+        viral_score: clip.viral_score,
+        emotional_intensity: clip.emotional_intensity,
+        controversy_level: clip.controversy_level,
+        relatability: clip.relatability,
+        educational_value: clip.educational_value,
+        entertainment_factor: clip.entertainment_factor,
+        combined_score: clip.combined_score,
+        suggested_caption: clip.suggested_caption
+      };
+      
+      // Debug logging
+      console.log('Saving clip with video title:', clipWithMetadata.video_title);
+      console.log('Full clip metadata:', clipWithMetadata);
+      onSaveClip(clipWithMetadata);
+    }
+  };
+
+  const isClipSaved = (clipId: string) => {
+    return savedClips.some(savedClip => savedClip.id === clipId);
   };
 
   const isProcessing = videoProcessing.isPending;
@@ -127,7 +175,13 @@ export const VideoProcessor: React.FC = () => {
             
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {videoProcessing.data.clips.map((clip: Clip, index: number) => (
-                <ClipCard key={clip.id} clip={clip} index={index} />
+                <ClipCard 
+                  key={clip.id} 
+                  clip={clip} 
+                  index={index}
+                  onSaveToLibrary={(clipToSave) => handleSaveToLibrary(clipToSave, index)}
+                  isSaved={isClipSaved(clip.id)}
+                />
               ))}
             </div>
             

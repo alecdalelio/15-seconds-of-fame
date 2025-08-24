@@ -17,10 +17,16 @@ A web application that analyzes YouTube videos to find the most viral 15-second 
 - **Audio Analysis**: Advanced audio processing for better clip selection
 - **Real-time Processing**: Fast video processing with progress tracking
 
-### 📚 Clip Library
-- **Save Favorite Clips**: Build a personal library of your best viral clips
-- **Search & Organize**: Find clips by transcript or viral reasoning
-- **Easy Access**: Quick playback and management of saved clips
+### 📚 Enhanced Clip Library
+- **Video Management**: View all processed videos with AI-generated and manual clips
+- **Manual Clip Creation**: Create custom clips from any part of your videos
+- **Unified Library**: Save and organize both AI-generated and manual clips
+- **Persistent Storage**: Clips are saved locally and persist between sessions
+- **Advanced Search**: Search by transcript, reasoning, or video title
+- **Filter Options**: Filter by AI-generated vs manual clips
+- **Detailed Analysis**: Expand clips to view full viral analysis breakdown
+- **Rich Metadata**: View titles, scores, captions, and timing information
+- **Video Source Tracking**: See actual video titles with direct links to source videos
 
 ## 🏗️ Architecture
 
@@ -190,13 +196,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - GPT-4 analyzes each clip for viral potential
 - Scores based on emotional intensity, controversy, relatability
 - Provides detailed reasoning for viral potential
+- Generates catchy titles and social media captions
 - Ranks clips by engagement likelihood
 
-### 3. Results
-- View top viral clips with scores
-- Play audio previews
-- Save favorite clips to library
-- Access detailed viral analysis
+### 3. Results & Library
+- View top 3-5 most viral clips with AI-generated titles
+- Play audio previews with suggested social media captions
+- Save favorite clips to personal library
+- Create custom clips from any video
+- Access detailed viral analysis with visual score breakdown
+- Organize and search your clip collection
 
 ## 🙏 Acknowledgments
 

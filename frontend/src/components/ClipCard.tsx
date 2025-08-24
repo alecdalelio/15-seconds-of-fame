@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PlayIcon, ClockIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
+import { PlayIcon, ClockIcon, ChevronDownIcon, ChevronUpIcon, HeartIcon } from '@heroicons/react/24/outline';
 import type { Clip } from '../types/api';
 import { ScoreDisplay } from './ScoreDisplay';
 import { ViralAnalysisDisplay } from './ViralAnalysisDisplay';
@@ -8,9 +8,11 @@ import { formatTime, truncateText } from '../utils/validation';
 interface ClipCardProps {
   clip: Clip;
   index: number;
+  onSaveToLibrary?: (clip: Clip) => void;
+  isSaved?: boolean;
 }
 
-export const ClipCard: React.FC<ClipCardProps> = ({ clip, index }) => {
+export const ClipCard: React.FC<ClipCardProps> = ({ clip, index, onSaveToLibrary, isSaved = false }) => {
   const [showViralAnalysis, setShowViralAnalysis] = useState(false);
 
   const handlePlayAudio = async () => {
@@ -53,7 +55,7 @@ export const ClipCard: React.FC<ClipCardProps> = ({ clip, index }) => {
           </div>
           <div>
             <h3 className="font-semibold text-gray-900">
-              Clip {index + 1}
+              {clip.title || `Clip ${index + 1}`}
             </h3>
             <div className="flex items-center gap-2 text-sm text-gray-500">
               <ClockIcon className="h-4 w-4" />
@@ -78,6 +80,15 @@ export const ClipCard: React.FC<ClipCardProps> = ({ clip, index }) => {
             {clip.reasoning}
           </p>
         </div>
+
+        {clip.suggested_caption && (
+          <div>
+            <h4 className="text-sm font-medium text-gray-700 mb-1">Suggested Caption</h4>
+            <p className="text-sm text-gray-600 bg-blue-50 rounded-lg p-3 border border-blue-200">
+              {clip.suggested_caption}
+            </p>
+          </div>
+        )}
 
         {/* Viral Analysis Toggle */}
         {(clip.viral_score || clip.combined_score) && (
@@ -112,13 +123,29 @@ export const ClipCard: React.FC<ClipCardProps> = ({ clip, index }) => {
         )}
 
         <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-          <button
-            onClick={handlePlayAudio}
-            className="flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 transition-colors"
-          >
-            <PlayIcon className="h-4 w-4" />
-            Play Audio
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handlePlayAudio}
+              className="flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 transition-colors"
+            >
+              <PlayIcon className="h-4 w-4" />
+              Play Audio
+            </button>
+            
+            {onSaveToLibrary && (
+              <button
+                onClick={() => onSaveToLibrary(clip)}
+                className={`flex items-center gap-2 text-sm transition-colors ${
+                  isSaved 
+                    ? 'text-red-600 hover:text-red-700' 
+                    : 'text-gray-600 hover:text-primary-600'
+                }`}
+              >
+                <HeartIcon className={`h-4 w-4 ${isSaved ? 'fill-current' : ''}`} />
+                {isSaved ? 'Saved' : 'Save to Library'}
+              </button>
+            )}
+          </div>
           
           <div className="text-xs text-gray-500">
             Duration: {formatTime(clip.end_time - clip.start_time)}

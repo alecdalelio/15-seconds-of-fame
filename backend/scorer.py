@@ -29,6 +29,14 @@ def score_segments(segments: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             viral_analysis
         )
         
+        # Get video information
+        video_title = segment.get("video_title", "Unknown Video")
+        video_source = segment.get("video_url", "")
+        
+        # Debug logging
+        print(f"Scorer - Segment {segment['id']} - video_title: {video_title}")
+        print(f"Scorer - Segment {segment['id']} - video_source: {video_source}")
+        
         scored_clip = {
             "id": f"clip_{segment['id']}",
             "segment_id": segment["id"],
@@ -47,17 +55,28 @@ def score_segments(segments: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             "educational_value": viral_analysis.educational_value,
             "entertainment_factor": viral_analysis.entertainment_factor,
             "combined_score": viral_analysis.combined_score,
+            # Clip metadata
+            "title": viral_analysis.clip_title,
+            "suggested_caption": viral_analysis.suggested_caption,
+            # Video source information
+            "video_title": video_title,
+            "video_source": video_source,
             # API usage tracking
             "api_usage_tokens": getattr(viral_analysis, 'api_usage_tokens', 0),
             "api_usage_cost": getattr(viral_analysis, 'api_usage_cost', 0.0)
         }
+        
+        # Debug logging
+        if video_title != "Unknown Video":
+            print(f"Clip {scored_clip['id']} from video: {video_title}")
         
         scored_clips.append(scored_clip)
     
     # Sort by combined score (highest first)
     scored_clips.sort(key=lambda x: x["combined_score"], reverse=True)
     
-    return scored_clips
+    # Return only the top 5 most viral clips (as per assignment requirements)
+    return scored_clips[:5]
 
 def calculate_enhanced_score(transcript: str, viral_analysis) -> float:
     """

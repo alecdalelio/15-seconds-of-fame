@@ -39,7 +39,7 @@ def process_video(youtube_url: str) -> List[Dict[str, Any]]:
         database.db.add_video(video_id, youtube_url)
         
         # Download video
-        video_path = download_youtube_video(youtube_url, downloads_dir, video_id)
+        video_path, video_title = download_youtube_video(youtube_url, downloads_dir, video_id)
         if not video_path:
             raise Exception("Failed to download video")
         
@@ -54,7 +54,14 @@ def process_video(youtube_url: str) -> List[Dict[str, Any]]:
         # Generate transcripts for each segment
         segments_with_transcripts = generate_transcripts(segments)
         
-        logger.info(f"Successfully processed video into {len(segments_with_transcripts)} segments")
+        # Add video title to each segment
+        print(f"Adding video title '{video_title}' to {len(segments_with_transcripts)} segments")
+        for segment in segments_with_transcripts:
+            segment['video_title'] = video_title
+            segment['video_url'] = youtube_url
+            print(f"Segment {segment['id']} - video_title: {segment['video_title']}")
+        
+        logger.info(f"Successfully processed video '{video_title}' into {len(segments_with_transcripts)} segments")
         
         # Update database with clips and mark as completed
         database.db.add_clips(video_id, segments_with_transcripts)
@@ -68,8 +75,8 @@ def process_video(youtube_url: str) -> List[Dict[str, Any]]:
             database.db.update_video_status(video_id, "failed")
         raise
 
-def download_youtube_video(url: str, downloads_dir: Path, video_id: str) -> str:
-    """Download YouTube video using yt-dlp."""
+def download_youtube_video(url: str, downloads_dir: Path, video_id: str) -> tuple[str, str]:
+    """Download YouTube video using yt-dlp and return path and title."""
     try:
         video_path = downloads_dir / f"{video_id}_video.mp4"
         
@@ -80,18 +87,53 @@ def download_youtube_video(url: str, downloads_dir: Path, video_id: str) -> str:
         }
         
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url])
+            try:
+                # First, extract info to get the title
+                info = ydl.extract_info(url, download=False)
+                video_title = info.get('title', 'Unknown Video')
+                
+                # Debug logging
+                print(f"Extracted video title: {video_title}")
+                print(f"Video info keys: {list(info.keys())}")
+                
+                # Then download the video
+                ydl.download([url])
+            except Exception as e:
+                print(f"Error extracting video info: {e}")
+                # Try to extract video ID from URL as fallback
+                try:
+                    from urllib.parse import urlparse, parse_qs
+                    parsed_url = urlparse(url)
+                    if 'youtube.com' in parsed_url.netloc:
+                        video_id = parse_qs(parsed_url.query).get('v', [None])[0]
+                        if video_id:
+                            video_title = f"YouTube Video ({video_id[:8]}...)"
+                        else:
+                            video_title = 'Unknown Video'
+                    elif 'youtu.be' in parsed_url.netloc:
+                        video_id = parsed_url.path[1:]  # Remove leading slash
+                        if video_id:
+                            video_title = f"YouTube Video ({video_id[:8]}...)"
+                        else:
+                            video_title = 'Unknown Video'
+                    else:
+                        video_title = 'Unknown Video'
+                except:
+                    video_title = 'Unknown Video'
+                
+                # Still try to download
+                ydl.download([url])
         
         if video_path.exists():
             logger.info(f"Video downloaded to: {video_path}")
-            return str(video_path)
+            return str(video_path), video_title
         else:
             logger.error("Video file not found after download")
-            return None
+            return None, None
             
     except Exception as e:
         logger.error(f"Error downloading video: {str(e)}")
-        return None
+        return None, None
 
 def extract_audio(video_path: str, downloads_dir: Path, video_id: str) -> str:
     """Extract audio from video file."""
