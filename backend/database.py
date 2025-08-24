@@ -36,12 +36,7 @@ class VideoDatabase:
             # Clips table - stores metadata about individual clips
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS clips (
-                    audio_quality_score REAL DEFAULT 5.0,
-                    dramatic_intensity REAL DEFAULT 5.0,
-                    speech_clarity REAL DEFAULT 5.0,
-                    segment_coherence REAL DEFAULT 5.0,
-                    overall_score REAL DEFAULT 5.0,
-                    boundary_type TEXT DEFAULT "unknown",                    id TEXT PRIMARY KEY,
+                    id TEXT PRIMARY KEY,
                     video_id TEXT NOT NULL,
                     segment_id TEXT NOT NULL,
                     start_time REAL NOT NULL,
@@ -52,6 +47,22 @@ class VideoDatabase:
                     audio_path TEXT,
                     video_path TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    audio_quality_score REAL DEFAULT 5.0,
+                    dramatic_intensity REAL DEFAULT 5.0,
+                    speech_clarity REAL DEFAULT 5.0,
+                    segment_coherence REAL DEFAULT 5.0,
+                    overall_score REAL DEFAULT 5.0,
+                    boundary_type TEXT DEFAULT "unknown",
+                    viral_score REAL DEFAULT 5.0,
+                    emotional_intensity REAL DEFAULT 5.0,
+                    controversy_level REAL DEFAULT 5.0,
+                    relatability REAL DEFAULT 5.0,
+                    educational_value REAL DEFAULT 5.0,
+                    entertainment_factor REAL DEFAULT 5.0,
+                    viral_reasoning TEXT,
+                    combined_score REAL DEFAULT 5.0,
+                    api_usage_tokens INTEGER DEFAULT 0,
+                    api_usage_cost REAL DEFAULT 0.0,
                     FOREIGN KEY (video_id) REFERENCES videos (id)
                 )
             ''')
@@ -88,8 +99,16 @@ class VideoDatabase:
                 cursor = conn.cursor()
                 for clip in clips:
                     cursor.execute('''
-                        INSERT INTO clips (id, video_id, segment_id, start_time, end_time, transcript, score, reasoning, audio_path, video_path, audio_quality_score, dramatic_intensity, speech_clarity, segment_coherence, overall_score, boundary_type)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        INSERT INTO clips (
+                            id, video_id, segment_id, start_time, end_time, transcript, 
+                            score, reasoning, audio_path, video_path, 
+                            audio_quality_score, dramatic_intensity, speech_clarity, 
+                            segment_coherence, overall_score, boundary_type,
+                            viral_score, emotional_intensity, controversy_level, 
+                            relatability, educational_value, entertainment_factor,
+                            viral_reasoning, combined_score, api_usage_tokens, api_usage_cost
+                        )
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ''', (
                         clip['id'],
                         video_id,
@@ -100,7 +119,23 @@ class VideoDatabase:
                         clip.get('score', 0.0),
                         clip.get('reasoning', ''),
                         clip.get('audio_path', ''),
-                        clip.get('video_path', '')
+                        clip.get('video_path', ''),
+                        clip.get('audio_quality_score', 5.0),
+                        clip.get('dramatic_intensity', 5.0),
+                        clip.get('speech_clarity', 5.0),
+                        clip.get('segment_coherence', 5.0),
+                        clip.get('overall_score', 5.0),
+                        clip.get('boundary_type', 'unknown'),
+                        clip.get('viral_score', 5.0),
+                        clip.get('emotional_intensity', 5.0),
+                        clip.get('controversy_level', 5.0),
+                        clip.get('relatability', 5.0),
+                        clip.get('educational_value', 5.0),
+                        clip.get('entertainment_factor', 5.0),
+                        clip.get('viral_reasoning', ''),
+                        clip.get('combined_score', 5.0),
+                        clip.get('api_usage_tokens', 0),
+                        clip.get('api_usage_cost', 0.0)
                     ))
                 conn.commit()
                 logger.info(f"Added {len(clips)} clips for video {video_id}")

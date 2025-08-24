@@ -7,6 +7,7 @@ from typing import List, Dict, Any
 import clipper
 import scorer
 import database
+import viral_analyzer
 import os
 from datetime import datetime
 
@@ -97,6 +98,24 @@ async def get_video_info(video_id: str):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting video info: {str(e)}")
+
+@app.get("/api/usage")
+async def get_api_usage():
+    """Get OpenAI API usage statistics."""
+    try:
+        usage_stats = openai_analyzer.analyzer.get_usage_stats()
+        return usage_stats
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting usage stats: {str(e)}")
+
+@app.post("/api/reset-usage")
+async def reset_api_usage():
+    """Reset daily API usage counters."""
+    try:
+        openai_analyzer.analyzer.reset_daily_usage()
+        return {"message": "Daily usage counters reset successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error resetting usage: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn

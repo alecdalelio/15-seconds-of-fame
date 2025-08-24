@@ -1,9 +1,10 @@
 from typing import List, Dict, Any
 import re
+from viral_analyzer import analyzer
 
 def score_segments(segments: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """
-    Score transcript segments based on engagement potential.
+    Score transcript segments based on engagement potential and viral analysis.
     
     Args:
         segments (List[Dict[str, Any]]): List of video segments with transcripts
@@ -11,32 +12,77 @@ def score_segments(segments: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     Returns:
         List[Dict[str, Any]]: List of scored clips with rankings
     """
-    print(f"Scoring {len(segments)} segments")
+    print(f"Scoring {len(segments)} segments with OpenAI viral analysis")
     
     scored_clips = []
     
     for segment in segments:
-        # Basic scoring based on transcript content
-        score = calculate_engagement_score(segment.get("transcript", ""))
+        # Get OpenAI viral analysis
+        viral_analysis = analyzer.analyze_viral_potential(
+            segment.get("transcript", ""), 
+            segment
+        )
+        
+        # Calculate combined score using both traditional and viral analysis
+        combined_score = calculate_enhanced_score(
+            segment.get("transcript", ""), 
+            viral_analysis
+        )
         
         scored_clip = {
             "id": f"clip_{segment['id']}",
             "segment_id": segment["id"],
-            "score": score,
+            "score": combined_score,
             "start_time": segment["start_time"],
             "end_time": segment["end_time"],
             "transcript": segment.get("transcript", ""),
             "audio_path": segment.get("audio_path", ""),
             "video_path": segment.get("video_path", ""),
-            "reasoning": generate_reasoning(segment.get("transcript", ""), score)
+            "reasoning": viral_analysis.viral_reasoning,
+            # Viral analysis scores
+            "viral_score": viral_analysis.viral_score,
+            "emotional_intensity": viral_analysis.emotional_intensity,
+            "controversy_level": viral_analysis.controversy_level,
+            "relatability": viral_analysis.relatability,
+            "educational_value": viral_analysis.educational_value,
+            "entertainment_factor": viral_analysis.entertainment_factor,
+            "combined_score": viral_analysis.combined_score,
+            # API usage tracking
+            "api_usage_tokens": getattr(viral_analysis, 'api_usage_tokens', 0),
+            "api_usage_cost": getattr(viral_analysis, 'api_usage_cost', 0.0)
         }
         
         scored_clips.append(scored_clip)
     
-    # Sort by score (highest first)
-    scored_clips.sort(key=lambda x: x["score"], reverse=True)
+    # Sort by combined score (highest first)
+    scored_clips.sort(key=lambda x: x["combined_score"], reverse=True)
     
     return scored_clips
+
+def calculate_enhanced_score(transcript: str, viral_analysis) -> float:
+    """
+    Calculate enhanced score combining traditional and viral analysis.
+    
+    Args:
+        transcript (str): The transcript text to analyze
+        viral_analysis: OpenAI viral analysis results
+        
+    Returns:
+        float: Enhanced score between 0 and 10
+    """
+    if not transcript or transcript.strip() == "":
+        return 0.0
+    
+    # Get traditional engagement score
+    traditional_score = calculate_engagement_score(transcript)
+    
+    # Get viral analysis combined score
+    viral_score = viral_analysis.combined_score
+    
+    # Weight the scores (70% viral analysis, 30% traditional)
+    enhanced_score = (viral_score * 0.7) + (traditional_score * 0.3)
+    
+    return round(enhanced_score, 1)
 
 def calculate_engagement_score(transcript: str) -> float:
     """
