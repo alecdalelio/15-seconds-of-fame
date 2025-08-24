@@ -36,7 +36,12 @@ class VideoDatabase:
             # Clips table - stores metadata about individual clips
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS clips (
-                    id TEXT PRIMARY KEY,
+                    audio_quality_score REAL DEFAULT 5.0,
+                    dramatic_intensity REAL DEFAULT 5.0,
+                    speech_clarity REAL DEFAULT 5.0,
+                    segment_coherence REAL DEFAULT 5.0,
+                    overall_score REAL DEFAULT 5.0,
+                    boundary_type TEXT DEFAULT "unknown",                    id TEXT PRIMARY KEY,
                     video_id TEXT NOT NULL,
                     segment_id TEXT NOT NULL,
                     start_time REAL NOT NULL,
@@ -83,8 +88,8 @@ class VideoDatabase:
                 cursor = conn.cursor()
                 for clip in clips:
                     cursor.execute('''
-                        INSERT INTO clips (id, video_id, segment_id, start_time, end_time, transcript, score, reasoning, audio_path, video_path)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        INSERT INTO clips (id, video_id, segment_id, start_time, end_time, transcript, score, reasoning, audio_path, video_path, audio_quality_score, dramatic_intensity, speech_clarity, segment_coherence, overall_score, boundary_type)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ''', (
                         clip['id'],
                         video_id,

@@ -1,3 +1,5 @@
+import audio_analyzer
+import audio_analyzer
 import database
 import os
 import uuid
@@ -129,7 +131,7 @@ def split_audio_into_segments(audio_path: str, downloads_dir: Path, video_id: st
                 "end_time": duration_seconds,
                 "audio_path": str(downloads_dir / f"{video_id}_segment_1.mp3"),
                 "video_path": str(downloads_dir / f"{video_id}_video.mp4"),
-                "transcript": ""
+                "transcript": "", "audio_quality_score": 5.0, "dramatic_intensity": 5.0, "speech_clarity": 5.0, "segment_coherence": 5.0, "overall_score": 5.0, "boundary_type": "fixed"
             }
             segments.append(segment)
             
@@ -153,7 +155,7 @@ def split_audio_into_segments(audio_path: str, downloads_dir: Path, video_id: st
                 "end_time": end_seconds,
                 "audio_path": str(downloads_dir / f"{video_id}_segment_{segment_count}.mp3"),
                 "video_path": str(downloads_dir / f"{video_id}_video.mp4"),
-                "transcript": ""
+                "transcript": "", "audio_quality_score": 5.0, "dramatic_intensity": 5.0, "speech_clarity": 5.0, "segment_coherence": 5.0, "overall_score": 5.0, "boundary_type": "fixed"
             }
             
             # Export segment
