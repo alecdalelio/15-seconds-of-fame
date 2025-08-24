@@ -77,48 +77,48 @@ export const ClipLibrary: React.FC<ClipLibraryProps> = ({ savedClips, onRemoveCl
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
           My Viral Clips Library
         </h1>
-        <p className="text-gray-600">
+        <p className="text-sm sm:text-base text-gray-600">
           Save and organize your favorite viral clips, both AI-generated and custom-created
         </p>
       </div>
 
-              {/* Search and Filters */}
-        <div className="flex items-center justify-between">
-          <div className="flex-1 max-w-md">
-            <input
-              type="text"
-              placeholder="Search clips by transcript, reasoning, or video title..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-          <div className="flex items-center gap-4">
-            <select
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value as 'all' | 'ai' | 'manual')}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">All Clips</option>
-              <option value="ai">AI Generated</option>
-              <option value="manual">Manual Clips</option>
-            </select>
-            <div className="text-sm text-gray-500">
-              {filteredClips.length} of {savedClips.length} clips
-            </div>
-            {savedClips.length > 0 && onClearAll && (
-              <button
-                onClick={onClearAll}
-                className="px-3 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-              >
-                Clear All
-              </button>
-            )}
-          </div>
+      {/* Search and Filters */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex-1 max-w-md">
+          <input
+            type="text"
+            placeholder="Search clips by transcript, reasoning, or video title..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
         </div>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          <select
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value as 'all' | 'ai' | 'manual')}
+            className="px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="all">All Clips</option>
+            <option value="ai">AI Generated</option>
+            <option value="manual">Manual Clips</option>
+          </select>
+          <div className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
+            {filteredClips.length} of {savedClips.length} clips
+          </div>
+          {savedClips.length > 0 && onClearAll && (
+            <button
+              onClick={onClearAll}
+              className="px-3 py-2 text-xs sm:text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+            >
+              Clear All
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* Videos Section */}
       {videos.length > 0 && (

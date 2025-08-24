@@ -95,10 +95,10 @@ export const VideoProcessor: React.FC<VideoProcessorProps> = ({
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
           15 Seconds of Fame
         </h1>
-        <p className="text-gray-600">
+        <p className="text-sm sm:text-base text-gray-600">
           Transform any YouTube video into viral 15-second clips with AI-powered scoring
         </p>
       </div>
@@ -112,7 +112,7 @@ export const VideoProcessor: React.FC<VideoProcessorProps> = ({
               <label htmlFor="youtube-url" className="block text-sm font-medium text-gray-700 mb-2">
                 YouTube Video URL
               </label>
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   id="youtube-url"
                   type="url"
@@ -128,7 +128,7 @@ export const VideoProcessor: React.FC<VideoProcessorProps> = ({
                 <button
                   type="submit"
                   disabled={isProcessing}
-                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 px-4 py-2 text-sm sm:text-base"
                 >
                   {isProcessing ? (
                     <>
@@ -164,16 +164,16 @@ export const VideoProcessor: React.FC<VideoProcessorProps> = ({
         {/* Results Display */}
         {hasResults && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-900">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
                 Your Viral Clips ({videoProcessing.data.clips.length} clips)
               </h2>
-              <div className="text-sm text-gray-500">
+              <div className="text-xs sm:text-sm text-gray-500">
                 Sorted by viral potential
               </div>
             </div>
             
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
               {videoProcessing.data.clips.map((clip: Clip, index: number) => (
                 <ClipCard 
                   key={clip.id} 
@@ -185,7 +185,7 @@ export const VideoProcessor: React.FC<VideoProcessorProps> = ({
               ))}
             </div>
             
-            <div className="text-center text-sm text-gray-500 mt-6">
+            <div className="text-center text-xs sm:text-sm text-gray-500 mt-6">
               <p>💡 Tip: Higher scores indicate better viral potential!</p>
             </div>
           </div>

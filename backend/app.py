@@ -58,6 +58,28 @@ async def get_audio(clip_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error serving audio: {str(e)}")
 
+@app.get("/video/{clip_id}")
+async def get_video_clip(clip_id: str):
+    """Serve video clip files."""
+    try:
+        # Look for the video clip file in the downloads directory
+        downloads_dir = "downloads"
+        video_file = None
+        
+        # Search for files that match the clip_id pattern
+        for filename in os.listdir(downloads_dir):
+            if filename.startswith(clip_id.replace("clip_", "")) and filename.endswith(".mp4"):
+                video_file = os.path.join(downloads_dir, filename)
+                break
+        
+        if video_file and os.path.exists(video_file):
+            return FileResponse(video_file, media_type="video/mp4")
+        else:
+            raise HTTPException(status_code=404, detail="Video clip file not found")
+            
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error serving video clip: {str(e)}")
+
 @app.post("/process", response_model=ProcessResponse)
 async def process_video(request: ProcessRequest):
     try:

@@ -13,6 +13,17 @@ export const extractVideoId = (url: string): string | null => {
 export const formatTime = (seconds: number): string => {
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
+  
+  // For durations less than 1 minute, show seconds with decimal if needed
+  if (mins === 0) {
+    if (secs === Math.floor(seconds)) {
+      return `${secs}s`;
+    } else {
+      return `${seconds.toFixed(1)}s`;
+    }
+  }
+  
+  // For longer durations, use MM:SS format
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 

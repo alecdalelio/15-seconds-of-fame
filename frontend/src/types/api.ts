@@ -11,6 +11,7 @@ export interface Clip {
   transcript: string;
   audio_path: string;
   video_path: string;
+  video_clip_path?: string;  // Add video clip path
   reasoning: string;
   // Viral analysis scores
   viral_score?: number;

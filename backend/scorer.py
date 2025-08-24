@@ -46,6 +46,7 @@ def score_segments(segments: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             "transcript": segment.get("transcript", ""),
             "audio_path": segment.get("audio_path", ""),
             "video_path": segment.get("video_path", ""),
+            "video_clip_path": segment.get("video_clip_path", ""),  # Add video clip path
             "reasoning": viral_analysis.viral_reasoning,
             # Viral analysis scores
             "viral_score": viral_analysis.viral_score,

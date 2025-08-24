@@ -86,12 +86,12 @@ export const ViralAnalysisDisplay: React.FC<ViralAnalysisDisplayProps> = ({
       <div className="bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg p-4 text-white">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold">AI Viral Analysis</h3>
-            <p className="text-primary-100 text-sm">Combined viral potential score</p>
+            <h3 className="text-lg font-semibold text-gray-800">AI Viral Analysis</h3>
+            <p className="text-gray-600 text-sm">Combined viral potential score</p>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold">{combined_score.toFixed(1)}</div>
-            <div className="text-primary-100 text-sm">/ 10</div>
+            <div className="text-3xl font-bold text-gray-800">{combined_score.toFixed(1)}</div>
+            <div className="text-gray-600 text-sm">/ 10</div>
           </div>
         </div>
       </div>

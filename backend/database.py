@@ -37,33 +37,33 @@ class VideoDatabase:
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS clips (
                     id TEXT PRIMARY KEY,
-                    video_id TEXT NOT NULL,
-                    segment_id TEXT NOT NULL,
-                    start_time REAL NOT NULL,
-                    end_time REAL NOT NULL,
+                    video_id TEXT,
+                    segment_id TEXT,
+                    start_time REAL,
+                    end_time REAL,
                     transcript TEXT,
                     score REAL,
                     reasoning TEXT,
                     audio_path TEXT,
                     video_path TEXT,
+                    video_clip_path TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     audio_quality_score REAL DEFAULT 5.0,
                     dramatic_intensity REAL DEFAULT 5.0,
                     speech_clarity REAL DEFAULT 5.0,
                     segment_coherence REAL DEFAULT 5.0,
                     overall_score REAL DEFAULT 5.0,
-                    boundary_type TEXT DEFAULT "unknown",
+                    boundary_type TEXT DEFAULT 'unknown',
                     viral_score REAL DEFAULT 5.0,
                     emotional_intensity REAL DEFAULT 5.0,
                     controversy_level REAL DEFAULT 5.0,
                     relatability REAL DEFAULT 5.0,
                     educational_value REAL DEFAULT 5.0,
                     entertainment_factor REAL DEFAULT 5.0,
-                    viral_reasoning TEXT,
+                    viral_reasoning TEXT DEFAULT '',
                     combined_score REAL DEFAULT 5.0,
                     api_usage_tokens INTEGER DEFAULT 0,
-                    api_usage_cost REAL DEFAULT 0.0,
-                    FOREIGN KEY (video_id) REFERENCES videos (id)
+                    api_usage_cost REAL DEFAULT 0.0
                 )
             ''')
             
@@ -101,14 +101,14 @@ class VideoDatabase:
                     cursor.execute('''
                         INSERT INTO clips (
                             id, video_id, segment_id, start_time, end_time, transcript, 
-                            score, reasoning, audio_path, video_path, 
+                            score, reasoning, audio_path, video_path, video_clip_path,
                             audio_quality_score, dramatic_intensity, speech_clarity, 
                             segment_coherence, overall_score, boundary_type,
                             viral_score, emotional_intensity, controversy_level, 
                             relatability, educational_value, entertainment_factor,
                             viral_reasoning, combined_score, api_usage_tokens, api_usage_cost
                         )
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ''', (
                         clip['id'],
                         video_id,
@@ -120,6 +120,7 @@ class VideoDatabase:
                         clip.get('reasoning', ''),
                         clip.get('audio_path', ''),
                         clip.get('video_path', ''),
+                        clip.get('video_clip_path', ''),
                         clip.get('audio_quality_score', 5.0),
                         clip.get('dramatic_intensity', 5.0),
                         clip.get('speech_clarity', 5.0),
