@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PlayIcon } from '@heroicons/react/24/outline';
+import { PlayIcon, XMarkIcon, SparklesIcon, VideoCameraIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import { useVideoProcessing } from '../hooks/useVideoProcessing';
 import { isValidYouTubeUrl } from '../utils/validation';
 import { ProcessingStatus } from './ProcessingStatus';
@@ -9,18 +9,33 @@ import type { Clip } from '../types/api';
 
 interface VideoProcessorProps {
   savedClips: Clip[];
+  currentVideoUrl: string;
+  currentVideoResults: Clip[];
+  currentVideoTitle: string;
+  onVideoProcessed: (url: string, results: Clip[], title: string) => void;
+  onClearResults: () => void;
   onSaveClip: (clip: Clip) => void;
   onRemoveClip: (clipId: string) => void;
 }
 
 export const VideoProcessor: React.FC<VideoProcessorProps> = ({ 
   savedClips, 
+  currentVideoUrl,
+  currentVideoResults,
+  currentVideoTitle,
+  onVideoProcessed,
+  onClearResults,
   onSaveClip, 
   onRemoveClip 
 }) => {
-  const [youtubeUrl, setYoutubeUrl] = useState('');
+  const [youtubeUrl, setYoutubeUrl] = useState(currentVideoUrl);
   const [urlError, setUrlError] = useState('');
   const videoProcessing = useVideoProcessing();
+
+  // Update local state when persistent state changes
+  React.useEffect(() => {
+    setYoutubeUrl(currentVideoUrl);
+  }, [currentVideoUrl]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,6 +62,14 @@ export const VideoProcessor: React.FC<VideoProcessorProps> = ({
       videoProcessing.mutate({ youtube_url: youtubeUrl.trim() });
     }
   };
+
+  // Update persistent state when processing succeeds
+  React.useEffect(() => {
+    if (videoProcessing.isSuccess && videoProcessing.data?.clips) {
+      const videoTitle = videoProcessing.data.clips[0]?.video_title || 'Unknown Video';
+      onVideoProcessed(youtubeUrl, videoProcessing.data.clips, videoTitle);
+    }
+  }, [videoProcessing.isSuccess, videoProcessing.data, youtubeUrl, onVideoProcessed]);
 
   const handleSaveToLibrary = (clip: Clip, index: number) => {
     // Check if clip is already saved
@@ -76,121 +99,168 @@ export const VideoProcessor: React.FC<VideoProcessorProps> = ({
         suggested_caption: clip.suggested_caption
       };
       
-      // Debug logging
-      console.log('Saving clip with video title:', clipWithMetadata.video_title);
-      console.log('Full clip metadata:', clipWithMetadata);
       onSaveClip(clipWithMetadata);
     }
   };
 
-  const isClipSaved = (clipId: string) => {
-    return savedClips.some(savedClip => savedClip.id === clipId);
-  };
-
-  const isProcessing = videoProcessing.isPending;
-  const hasError = videoProcessing.isError;
-  const hasResults = videoProcessing.isSuccess && videoProcessing.data?.clips;
-
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="text-center">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-          15 Seconds of Fame
-        </h1>
-        <p className="text-sm sm:text-base text-gray-600">
-          Transform any YouTube video into viral 15-second clips with AI-powered scoring
-        </p>
+    <div className="max-w-7xl mx-auto space-y-8">
+      {/* Hero Section */}
+      <div className="text-center space-y-4">
+        <div className="flex items-center justify-center space-x-3 mb-6">
+          <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-2xl flex items-center justify-center shadow-glow">
+            <SparklesIcon className="w-8 h-8 text-white" />
+          </div>
+          <div className="text-left">
+            <h1 className="text-3xl sm:text-4xl font-bold gradient-text">
+              Create Viral Clips
+            </h1>
+            <p className="text-lg text-gray-600">
+              Transform any YouTube video into viral 15-second clips
+            </p>
+          </div>
+        </div>
+        
+        <div className="max-w-2xl mx-auto">
+          <p className="text-gray-600 leading-relaxed">
+            Our AI analyzes your video content and identifies the most engaging moments, 
+            creating optimized clips designed to go viral on social media platforms.
+          </p>
+        </div>
       </div>
 
-      {/* Main Content */}
-      <div className="space-y-6">
-        {/* Input Form */}
-        <div className="card">
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="youtube-url" className="block text-sm font-medium text-gray-700 mb-2">
-                YouTube Video URL
-              </label>
-              <div className="flex flex-col sm:flex-row gap-3">
+      {/* URL Input Section */}
+      <div className="max-w-3xl mx-auto">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="relative">
+            <div className="flex items-center space-x-3">
+              <div className="flex-1 relative">
                 <input
-                  id="youtube-url"
-                  type="url"
+                  type="text"
                   value={youtubeUrl}
-                  onChange={(e) => {
-                    setYoutubeUrl(e.target.value);
-                    if (urlError) setUrlError('');
-                  }}
-                  placeholder="https://www.youtube.com/watch?v=..."
-                  className="input-field flex-1"
-                  disabled={isProcessing}
+                  onChange={(e) => setYoutubeUrl(e.target.value)}
+                  placeholder="Paste a YouTube URL here..."
+                  className={`input-field pr-12 ${urlError ? 'border-red-300 focus:ring-red-500' : ''}`}
+                  disabled={videoProcessing.isPending}
                 />
-                <button
-                  type="submit"
-                  disabled={isProcessing}
-                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 px-4 py-2 text-sm sm:text-base"
-                >
-                  {isProcessing ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <PlayIcon className="h-4 w-4" />
-                      Process Video
-                    </>
-                  )}
-                </button>
+                <VideoCameraIcon className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               </div>
-              {urlError && (
-                <p className="mt-1 text-sm text-red-600">{urlError}</p>
-              )}
+              <button
+                type="submit"
+                disabled={videoProcessing.isPending}
+                className="btn-primary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {videoProcessing.isPending ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  <>
+                    <PlayIcon className="w-5 h-5" />
+                    <span>Process Video</span>
+                  </>
+                )}
+              </button>
             </div>
-          </form>
+            {urlError && (
+              <p className="text-red-600 text-sm mt-2 flex items-center space-x-1">
+                <XMarkIcon className="w-4 h-4" />
+                <span>{urlError}</span>
+              </p>
+            )}
+          </div>
+        </form>
+      </div>
+
+      {/* Processing Status */}
+      {videoProcessing.isPending && (
+        <div className="max-w-2xl mx-auto">
+          <ProcessingStatus isProcessing={true} />
         </div>
+      )}
 
-        {/* Processing Status */}
-        {isProcessing && <ProcessingStatus isProcessing={isProcessing} />}
-
-        {/* Error Display */}
-        {hasError && (
+      {/* Error Display */}
+      {videoProcessing.isError && (
+        <div className="max-w-2xl mx-auto">
           <ErrorMessage 
             message={videoProcessing.error?.message || 'An error occurred while processing the video.'}
             onRetry={handleRetry}
           />
-        )}
+        </div>
+      )}
 
-        {/* Results Display */}
-        {hasResults && (
-          <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
-                Your Viral Clips ({videoProcessing.data.clips.length} clips)
+      {/* Results Section */}
+      {currentVideoResults.length > 0 && (
+        <div className="space-y-6">
+          {/* Results Header */}
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-gray-900 flex items-center space-x-3">
+                <SparklesIcon className="w-6 h-6 text-primary-500" />
+                <span>Your Viral Clips</span>
+                <span className="text-lg text-gray-500">({currentVideoResults.length} clips)</span>
               </h2>
-              <div className="text-xs sm:text-sm text-gray-500">
+              {currentVideoTitle && (
+                <p className="text-gray-600 flex items-center space-x-2">
+                  <span>From:</span>
+                  <span className="font-medium text-gray-900">{currentVideoTitle}</span>
+                </p>
+              )}
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="text-sm text-gray-500">
                 Sorted by viral potential
               </div>
-            </div>
-            
-            <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-              {videoProcessing.data.clips.map((clip: Clip, index: number) => (
-                <ClipCard 
-                  key={clip.id} 
-                  clip={clip} 
-                  index={index}
-                  onSaveToLibrary={(clipToSave) => handleSaveToLibrary(clipToSave, index)}
-                  isSaved={isClipSaved(clip.id)}
-                />
-              ))}
-            </div>
-            
-            <div className="text-center text-xs sm:text-sm text-gray-500 mt-6">
-              <p>💡 Tip: Higher scores indicate better viral potential!</p>
+              <button
+                onClick={onClearResults}
+                className="btn-outline flex items-center space-x-2"
+              >
+                <XMarkIcon className="w-4 h-4" />
+                <span>Clear Results</span>
+              </button>
             </div>
           </div>
-        )}
-      </div>
+
+          {/* Clips Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {currentVideoResults.map((clip, index) => (
+              <ClipCard
+                key={clip.id}
+                clip={clip}
+                index={index}
+                onSaveToLibrary={(clip) => handleSaveToLibrary(clip, index)}
+                isSaved={savedClips.some(savedClip => savedClip.id === clip.id)}
+              />
+            ))}
+          </div>
+
+          {/* Call to Action */}
+          <div className="text-center py-8">
+            <div className="bg-gradient-to-r from-primary-50 to-secondary-50 rounded-2xl p-8 border border-primary-200/50">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                Ready to create more viral content?
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Try processing another video or explore your saved clips library.
+              </p>
+              <div className="flex items-center justify-center space-x-4">
+                <button
+                  onClick={() => setYoutubeUrl('')}
+                  className="btn-primary"
+                >
+                  Process Another Video
+                </button>
+                <div className="flex items-center space-x-2 text-gray-500">
+                  <span>or</span>
+                  <ArrowRightIcon className="w-4 h-4" />
+                  <span>Check your library</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

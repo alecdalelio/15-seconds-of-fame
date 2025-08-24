@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { PlayIcon, StopIcon, ClockIcon, ChevronDownIcon, ChevronUpIcon, HeartIcon, VideoCameraIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
+import { PlayIcon, StopIcon, ClockIcon, ChevronDownIcon, ChevronUpIcon, HeartIcon, VideoCameraIcon, ArrowDownTrayIcon, SparklesIcon, FireIcon } from '@heroicons/react/24/outline';
 import type { Clip } from '../types/api';
 import { ScoreDisplay } from './ScoreDisplay';
 import { ViralAnalysisDisplay } from './ViralAnalysisDisplay';
@@ -55,56 +55,69 @@ export const ClipCard: React.FC<ClipCardProps> = ({ clip, index, onSaveToLibrary
   const isThisClipPlaying = currentlyPlaying.clipId === clip.id;
 
   return (
-    <div className="card hover:shadow-md transition-shadow duration-200">
-      {/* Header - Responsive Layout */}
-      <div className="text-center mb-3">
-        <div className="flex justify-center mb-1">
-          <div className="w-8 h-8 bg-primary-500 text-white rounded-full flex items-center justify-center text-sm font-semibold">
-            #{index + 1}
+    <div className="bg-white rounded-2xl shadow-soft hover:shadow-medium transition-all duration-300 border border-gray-100/50 overflow-hidden group animate-slide-up">
+      {/* Header with Gradient Background */}
+      <div className="bg-gradient-to-r from-primary-50 to-secondary-50 p-6 border-b border-gray-100/50">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <div className="relative">
+              <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center shadow-glow">
+                <span className="text-white font-bold text-lg">#{index + 1}</span>
+              </div>
+              {clip.score >= 6.0 && (
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-accent-500 rounded-full flex items-center justify-center">
+                  <FireIcon className="w-2.5 h-2.5 text-white" />
+                </div>
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-gray-900 text-lg leading-tight mb-1">
+                {clip.title || `Clip ${index + 1}`}
+              </h3>
+              <div className="flex items-center space-x-2 text-sm text-gray-600">
+                <div className="flex items-center space-x-1 bg-white/70 px-2 py-1 rounded-lg">
+                  <ClockIcon className="h-4 w-4 text-primary-500" />
+                  <span className="font-medium">{formatTime(clip.start_time)} - {formatTime(clip.end_time)}</span>
+                </div>
+                <div className="bg-accent-100 text-accent-700 px-2 py-1 rounded-lg text-xs font-semibold">
+                  {formatTime(clip.end_time - clip.start_time)}
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        
-        <div className="text-center mb-2">
-          <h3 className="font-semibold text-gray-900 text-sm sm:text-base break-words">
-            {clip.title || `Clip ${index + 1}`}
-          </h3>
-        </div>
-        
-        <div className="flex items-center justify-center gap-3 mb-2">
-          <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full min-w-0 flex-shrink-0">
-            <ClockIcon className="h-3 w-3 flex-shrink-0" />
-            <span className="font-medium whitespace-nowrap">{formatTime(clip.start_time)} - {formatTime(clip.end_time)}</span>
+          
+          <div className="flex flex-col items-end space-y-2">
+            <ScoreDisplay score={clip.score} size="lg" showLabel={false} />
+            <div className="flex items-center space-x-1 bg-white/70 px-2 py-1 rounded-lg">
+              <SparklesIcon className="h-3 w-3 text-secondary-500" />
+              <span className="text-xs font-medium text-gray-600">AI Generated</span>
+            </div>
           </div>
-          <div className="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded-full flex-shrink-0">
-            <span className="font-medium">{formatTime(clip.end_time - clip.start_time)}</span>
-          </div>
-        </div>
-        
-        <div className="flex justify-center">
-          <ScoreDisplay score={clip.score} size="sm" showLabel={false} />
         </div>
       </div>
 
       {/* Video Player Section */}
       {clip.video_clip_path && (
-        <div className="mb-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
-            <h4 className="text-sm font-medium text-gray-700">Video Clip</h4>
+        <div className="p-6 border-b border-gray-100/50">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-sm font-semibold text-gray-700 flex items-center space-x-2">
+              <VideoCameraIcon className="h-4 w-4 text-primary-500" />
+              <span>Video Preview</span>
+            </h4>
             <button
               onClick={() => setShowVideo(!showVideo)}
-              className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-primary-600 hover:text-primary-700 transition-colors px-2 py-1.5 rounded-md hover:bg-primary-50 self-start sm:self-auto"
+              className="flex items-center space-x-2 text-sm text-primary-600 hover:text-primary-700 transition-colors px-3 py-1.5 rounded-lg hover:bg-primary-50 font-medium"
             >
-              <VideoCameraIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               <span>{showVideo ? 'Hide' : 'Show'} Video</span>
             </button>
           </div>
           
           {showVideo && (
-            <div className="bg-gray-100 rounded-lg p-2 sm:p-4">
+            <div className="bg-gray-50 rounded-xl p-4 border border-gray-200/50">
               <video 
                 ref={videoRef}
                 controls 
-                className="w-full rounded-lg"
+                className="w-full rounded-lg shadow-soft"
                 src={`http://localhost:8000/video/${clip.id}`}
                 preload="metadata"
                 onPlay={handleVideoPlay}
@@ -116,20 +129,33 @@ export const ClipCard: React.FC<ClipCardProps> = ({ clip, index, onSaveToLibrary
         </div>
       )}
 
-      <div className="space-y-3">
+      {/* Content Section */}
+      <div className="p-6 space-y-4">
+        {/* Transcript */}
         <div>
-          <h4 className="text-sm font-medium text-gray-700 mb-1">Transcript</h4>
-          <p className="text-xs sm:text-sm text-gray-600 bg-gray-50 rounded-lg p-2 sm:p-3">
-            {clip.transcript ? truncateText(clip.transcript, 150) : 'No transcript available'}
-          </p>
+          <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center space-x-2">
+            <span className="w-2 h-2 bg-primary-500 rounded-full"></span>
+            <span>Transcript</span>
+          </h4>
+          <div className="bg-gray-50 rounded-xl p-4 border border-gray-200/50">
+            <p className="text-sm text-gray-700 leading-relaxed">
+              {clip.transcript ? truncateText(clip.transcript, 200) : 'No transcript available'}
+            </p>
+          </div>
         </div>
 
+        {/* Suggested Caption */}
         {clip.suggested_caption && (
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-1">Suggested Caption</h4>
-            <p className="text-xs sm:text-sm text-gray-600 bg-blue-50 rounded-lg p-2 sm:p-3 border border-blue-200">
-              {clip.suggested_caption}
-            </p>
+            <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center space-x-2">
+              <span className="w-2 h-2 bg-secondary-500 rounded-full"></span>
+              <span>Suggested Caption</span>
+            </h4>
+            <div className="bg-gradient-to-r from-secondary-50 to-primary-50 rounded-xl p-4 border border-secondary-200/50">
+              <p className="text-sm text-gray-700 leading-relaxed font-medium">
+                {clip.suggested_caption}
+              </p>
+            </div>
           </div>
         )}
 
@@ -138,18 +164,18 @@ export const ClipCard: React.FC<ClipCardProps> = ({ clip, index, onSaveToLibrary
           <div>
             <button
               onClick={() => setShowViralAnalysis(!showViralAnalysis)}
-              className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-primary-600 hover:text-primary-700 transition-colors px-2 py-1.5 rounded-md hover:bg-primary-50"
+              className="flex items-center space-x-2 text-sm text-primary-600 hover:text-primary-700 transition-colors px-3 py-2 rounded-lg hover:bg-primary-50 font-medium w-full justify-center"
             >
               {showViralAnalysis ? (
-                <ChevronUpIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <ChevronUpIcon className="h-4 w-4" />
               ) : (
-                <ChevronDownIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <ChevronDownIcon className="h-4 w-4" />
               )}
               <span>{showViralAnalysis ? 'Hide' : 'Show'} AI Viral Analysis</span>
             </button>
             
             {showViralAnalysis && (
-              <div className="mt-3 pt-3 border-t border-gray-100">
+              <div className="mt-4 pt-4 border-t border-gray-100">
                 <ViralAnalysisDisplay
                   viral_score={clip.viral_score}
                   emotional_intensity={clip.emotional_intensity}
@@ -164,68 +190,63 @@ export const ClipCard: React.FC<ClipCardProps> = ({ clip, index, onSaveToLibrary
             )}
           </div>
         )}
+      </div>
 
-        <div className="pt-3 border-t border-gray-100">
-          {/* Action Buttons - Responsive Layout */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            {/* Button Group - Stacks vertically on mobile, horizontal on larger screens */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+      {/* Action Buttons */}
+      <div className="p-6 bg-gray-50/50 border-t border-gray-100/50">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          {/* Primary Actions */}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={handlePlayAudio}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                isThisClipPlaying && currentlyPlaying.type === 'audio'
+                  ? 'bg-success-100 text-success-700 shadow-soft'
+                  : 'bg-primary-100 text-primary-700 hover:bg-primary-200 shadow-soft'
+              }`}
+            >
+              {isThisClipPlaying && currentlyPlaying.type === 'audio' ? (
+                <StopIcon className="h-4 w-4" />
+              ) : (
+                <PlayIcon className="h-4 w-4" />
+              )}
+              <span>{isThisClipPlaying && currentlyPlaying.type === 'audio' ? 'Stop' : 'Play'} Audio</span>
+            </button>
+            
+            {onSaveToLibrary && (
               <button
-                onClick={handlePlayAudio}
-                className={`flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm transition-colors px-2 py-1.5 rounded-md ${
-                  isThisClipPlaying && currentlyPlaying.type === 'audio'
-                    ? 'text-green-600 bg-green-50 hover:bg-green-100'
-                    : 'text-primary-600 hover:text-primary-700 hover:bg-primary-50'
+                onClick={() => onSaveToLibrary(clip)}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  isSaved 
+                    ? 'bg-secondary-100 text-secondary-700 shadow-soft' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-secondary-100 hover:text-secondary-700 shadow-soft'
                 }`}
               >
-                {isThisClipPlaying && currentlyPlaying.type === 'audio' ? (
-                  <StopIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                ) : (
-                  <PlayIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                )}
-                <span className="hidden sm:inline">
-                  {isThisClipPlaying && currentlyPlaying.type === 'audio' ? 'Stop Audio' : 'Play Audio'}
-                </span>
-                <span className="sm:hidden">
-                  {isThisClipPlaying && currentlyPlaying.type === 'audio' ? 'Stop' : 'Audio'}
-                </span>
+                <HeartIcon className={`h-4 w-4 ${isSaved ? 'fill-current' : ''}`} />
+                <span>{isSaved ? 'Saved' : 'Save'}</span>
               </button>
-              
+            )}
+          </div>
+
+          {/* Download Actions */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleDownloadAudio}
+              className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm text-gray-600 hover:text-primary-600 transition-colors hover:bg-primary-50"
+            >
+              <ArrowDownTrayIcon className="h-4 w-4" />
+              <span className="hidden sm:inline">Audio</span>
+            </button>
+            
+            {clip.video_clip_path && (
               <button
-                onClick={handleDownloadAudio}
-                className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-600 hover:text-primary-600 transition-colors px-2 py-1.5 rounded-md hover:bg-gray-50"
+                onClick={handleDownloadVideo}
+                className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm text-gray-600 hover:text-primary-600 transition-colors hover:bg-primary-50"
               >
-                <ArrowDownTrayIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                <span className="hidden sm:inline">Download Audio</span>
-                <span className="sm:hidden">Audio</span>
+                <ArrowDownTrayIcon className="h-4 w-4" />
+                <span className="hidden sm:inline">Video</span>
               </button>
-              
-              {clip.video_clip_path && (
-                <button
-                  onClick={handleDownloadVideo}
-                  className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-600 hover:text-primary-600 transition-colors px-2 py-1.5 rounded-md hover:bg-gray-50"
-                >
-                  <ArrowDownTrayIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  <span className="hidden sm:inline">Download Video</span>
-                  <span className="sm:hidden">Video</span>
-                </button>
-              )}
-              
-              {onSaveToLibrary && (
-                <button
-                  onClick={() => onSaveToLibrary(clip)}
-                  className={`flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm transition-colors px-2 py-1.5 rounded-md ${
-                    isSaved 
-                      ? 'text-red-600 hover:text-red-700 hover:bg-red-50' 
-                      : 'text-gray-600 hover:text-primary-600 hover:bg-gray-50'
-                  }`}
-                >
-                  <HeartIcon className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${isSaved ? 'fill-current' : ''}`} />
-                  <span className="hidden sm:inline">{isSaved ? 'Saved' : 'Save to Library'}</span>
-                  <span className="sm:hidden">{isSaved ? 'Saved' : 'Save'}</span>
-                </button>
-              )}
-            </div>
+            )}
           </div>
         </div>
       </div>
