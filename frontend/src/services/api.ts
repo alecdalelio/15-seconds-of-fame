@@ -23,6 +23,18 @@ export const processVideo = async (request: ProcessVideoRequest): Promise<Proces
   return response.data;
 };
 
+// Get API usage statistics
+export const getApiUsage = async () => {
+  const response = await api.get('/api/usage');
+  return response.data;
+};
+
+// Reset API usage counters
+export const resetApiUsage = async () => {
+  const response = await api.post('/api/reset-usage');
+  return response.data;
+};
+
 // Error handler
 export const handleApiError = (error: any): string => {
   if (axios.isAxiosError(error)) {

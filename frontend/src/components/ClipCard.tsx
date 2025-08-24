@@ -1,7 +1,8 @@
-import React from 'react';
-import { PlayIcon, ClockIcon } from '@heroicons/react/24/outline';
+import React, { useState } from 'react';
+import { PlayIcon, ClockIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import type { Clip } from '../types/api';
 import { ScoreDisplay } from './ScoreDisplay';
+import { ViralAnalysisDisplay } from './ViralAnalysisDisplay';
 import { formatTime, truncateText } from '../utils/validation';
 
 interface ClipCardProps {
@@ -10,6 +11,8 @@ interface ClipCardProps {
 }
 
 export const ClipCard: React.FC<ClipCardProps> = ({ clip, index }) => {
+  const [showViralAnalysis, setShowViralAnalysis] = useState(false);
+
   const handlePlayAudio = async () => {
     try {
       console.log('Play audio for clip:', clip.id);
@@ -75,6 +78,38 @@ export const ClipCard: React.FC<ClipCardProps> = ({ clip, index }) => {
             {clip.reasoning}
           </p>
         </div>
+
+        {/* Viral Analysis Toggle */}
+        {(clip.viral_score || clip.combined_score) && (
+          <div>
+            <button
+              onClick={() => setShowViralAnalysis(!showViralAnalysis)}
+              className="flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 transition-colors"
+            >
+              {showViralAnalysis ? (
+                <ChevronUpIcon className="h-4 w-4" />
+              ) : (
+                <ChevronDownIcon className="h-4 w-4" />
+              )}
+              {showViralAnalysis ? 'Hide' : 'Show'} AI Viral Analysis
+            </button>
+            
+            {showViralAnalysis && (
+              <div className="mt-3 pt-3 border-t border-gray-100">
+                <ViralAnalysisDisplay
+                  viral_score={clip.viral_score}
+                  emotional_intensity={clip.emotional_intensity}
+                  controversy_level={clip.controversy_level}
+                  relatability={clip.relatability}
+                  educational_value={clip.educational_value}
+                  entertainment_factor={clip.entertainment_factor}
+                  combined_score={clip.combined_score}
+                  viral_reasoning={clip.reasoning}
+                />
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="flex items-center justify-between pt-3 border-t border-gray-100">
           <button
