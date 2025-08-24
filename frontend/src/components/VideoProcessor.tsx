@@ -121,7 +121,7 @@ export const VideoProcessor: React.FC = () => {
                 Your Viral Clips ({videoProcessing.data.clips.length} clips)
               </h2>
               <div className="text-sm text-gray-500">
-                Sorted by engagement potential
+                Sorted by viral potential
               </div>
             </div>
             

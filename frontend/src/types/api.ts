@@ -20,6 +20,10 @@ export interface Clip {
   educational_value?: number;
   entertainment_factor?: number;
   combined_score?: number;
+  // Viral reasoning and metadata
+  viral_reasoning?: string;
+  title?: string;
+  duration?: string;
   // API usage tracking
   api_usage_tokens?: number;
   api_usage_cost?: number;
