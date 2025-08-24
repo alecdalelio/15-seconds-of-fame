@@ -20,14 +20,14 @@ async def root():
 @app.post("/process", response_model=ProcessResponse)
 async def process_video(request: ProcessRequest):
     try:
-        # Call placeholder function in clipper.py to download and split video
+        # Call function in clipper.py to download and split video
         video_segments = clipper.process_video(request.youtube_url)
         
-        # Call placeholder function in scorer.py to score transcript segments
+        # Call function in scorer.py to score transcript segments
         scored_clips = scorer.score_segments(video_segments)
         
         return ProcessResponse(
-            clips=[],
+            clips=scored_clips,
             status="success"
         )
     except Exception as e:
