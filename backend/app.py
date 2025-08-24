@@ -6,7 +6,9 @@ from pydantic import BaseModel
 from typing import List, Dict, Any
 import clipper
 import scorer
+import database
 import os
+from datetime import datetime
 
 app = FastAPI(title="15 Seconds of Fame API", version="1.0.0")
 
@@ -70,6 +72,31 @@ async def process_video(request: ProcessRequest):
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing video: {str(e)}")
+
+@app.post("/cleanup")
+async def cleanup_old_files():
+    """Clean up old files (admin endpoint)."""
+    try:
+        deleted_count = database.db.cleanup_old_files()
+        return {"message": f"Cleanup completed. {deleted_count} files deleted."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error during cleanup: {str(e)}")
+
+@app.get("/videos/{video_id}")
+async def get_video_info(video_id: str):
+    """Get information about a processed video."""
+    try:
+        video_info = database.db.get_video_info(video_id)
+        if not video_info:
+            raise HTTPException(status_code=404, detail="Video not found")
+        
+        clips = database.db.get_video_clips(video_id)
+        return {
+            "video": video_info,
+            "clips": clips
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting video info: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn

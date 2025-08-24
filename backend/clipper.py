@@ -1,3 +1,4 @@
+import database
 import os
 import uuid
 import tempfile
@@ -32,6 +33,9 @@ def process_video(youtube_url: str) -> List[Dict[str, Any]]:
         # Generate unique identifier for this video
         video_id = str(uuid.uuid4())
         
+        # Add video to database
+        database.db.add_video(video_id, youtube_url)
+        
         # Download video
         video_path = download_youtube_video(youtube_url, downloads_dir, video_id)
         if not video_path:
@@ -49,10 +53,17 @@ def process_video(youtube_url: str) -> List[Dict[str, Any]]:
         segments_with_transcripts = generate_transcripts(segments)
         
         logger.info(f"Successfully processed video into {len(segments_with_transcripts)} segments")
+        
+        # Update database with clips and mark as completed
+        database.db.add_clips(video_id, segments_with_transcripts)
+        database.db.update_video_status(video_id, "completed")
         return segments_with_transcripts
         
     except Exception as e:
         logger.error(f"Error processing video: {str(e)}")
+        # Update status to failed if video_id exists
+        if 'video_id' in locals():
+            database.db.update_video_status(video_id, "failed")
         raise
 
 def download_youtube_video(url: str, downloads_dir: Path, video_id: str) -> str:
