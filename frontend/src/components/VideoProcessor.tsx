@@ -3,7 +3,7 @@ import { PlayIcon, XMarkIcon, VideoCameraIcon } from '@heroicons/react/24/outlin
 import Logo from './Logo';
 import { useVideoProcessing } from '../hooks/useVideoProcessing';
 import { isValidYouTubeUrl } from '../utils/validation';
-import { ProcessingStatus } from './ProcessingStatus';
+import ProgressSteps from './ProgressSteps';
 import { ErrorMessage } from './ErrorMessage';
 import { ClipCard } from './ClipCard';
 import type { Clip } from '../types/api';
@@ -33,6 +33,8 @@ export const VideoProcessor: React.FC<VideoProcessorProps> = ({
   const [urlError, setUrlError] = useState('');
   const videoProcessing = useVideoProcessing();
 
+
+
   // Update local state when persistent state changes
   React.useEffect(() => {
     setYoutubeUrl(currentVideoUrl);
@@ -54,7 +56,7 @@ export const VideoProcessor: React.FC<VideoProcessorProps> = ({
     
     setUrlError('');
     
-    // Process video
+    // Start processing
     videoProcessing.mutate({ youtube_url: youtubeUrl.trim() });
   };
 
@@ -71,6 +73,8 @@ export const VideoProcessor: React.FC<VideoProcessorProps> = ({
       onVideoProcessed(youtubeUrl, videoProcessing.data.clips, videoTitle);
     }
   }, [videoProcessing.isSuccess, videoProcessing.data, youtubeUrl, onVideoProcessed]);
+
+
 
   const handleSaveToLibrary = (clip: Clip, index: number) => {
     // Check if clip is already saved
@@ -175,7 +179,17 @@ export const VideoProcessor: React.FC<VideoProcessorProps> = ({
       {/* Processing Status */}
       {videoProcessing.isPending && (
         <div className="max-w-2xl mx-auto">
-          <ProcessingStatus isProcessing={true} />
+          <ProgressSteps
+            steps={[
+              { id: 'download', label: 'Downloading video from YouTube', status: 'pending' },
+              { id: 'audio', label: 'Extracting audio and creating segments', status: 'pending' },
+              { id: 'transcript', label: 'Generating transcripts with AI', status: 'pending' },
+              { id: 'analysis', label: 'Analyzing engagement potential', status: 'pending' },
+            ]}
+            autoAdvance={true}
+            isBackendComplete={false}
+            ariaLabel="Processing your video"
+          />
         </div>
       )}
 

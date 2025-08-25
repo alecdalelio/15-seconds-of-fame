@@ -157,5 +157,5 @@ function lighten(hex: string, pct = 6): string {
   const bb = clamp(b * f).toString(16).padStart(2, '0');
   return `#${rr}${gg}${bb}`;
 }
-
 export default Logo;
+

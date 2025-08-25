@@ -15,7 +15,7 @@ interface ClipCardProps {
 
 export const ClipCard: React.FC<ClipCardProps> = ({ clip, index, onSaveToLibrary, isSaved = false }) => {
   const [showViralAnalysis, setShowViralAnalysis] = useState(false);
-  const [showVideo, setShowVideo] = useState(false);
+  const [showVideo, setShowVideo] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { playAudio, playVideo, getCurrentlyPlaying } = useMediaContext();
 

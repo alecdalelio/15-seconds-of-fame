@@ -111,3 +111,11 @@
   background-size: 200px 100%;
   animation: shimmer 1.5s infinite;
 }
+
+/* Icon pop animation for completed checkmarks */
+@keyframes pop {
+  0% { transform: scale(0.9); }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+.icon-pop { animation: pop 220ms ease-out; }
