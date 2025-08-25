@@ -87,7 +87,7 @@ export const ClipCard: React.FC<ClipCardProps> = ({ clip, index, onSaveToLibrary
           </div>
           
           <div className="flex flex-col items-end space-y-2">
-            <ScoreDisplay score={clip.score} size="lg" showLabel={false} />
+            <ScoreDisplay score={clip.combined_score || clip.score} size="lg" showLabel={false} />
             <div className="flex items-center space-x-1 bg-white/70 px-2 py-1 rounded-lg">
               <SparklesIcon className="h-3 w-3 text-secondary-500" />
               <span className="text-xs font-medium text-gray-600">AI Generated</span>
