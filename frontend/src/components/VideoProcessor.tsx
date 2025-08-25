@@ -234,30 +234,7 @@ export const VideoProcessor: React.FC<VideoProcessorProps> = ({
             ))}
           </div>
 
-          {/* Call to Action */}
-          <div className="text-center py-8">
-            <div className="bg-gradient-to-r from-primary-50 to-secondary-50 rounded-2xl p-8 border border-primary-200/50">
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Ready to create more viral content?
-              </h3>
-              <p className="text-gray-600 mb-4">
-                Try processing another video or explore your saved clips library.
-              </p>
-              <div className="flex items-center justify-center space-x-4">
-                <button
-                  onClick={() => setYoutubeUrl('')}
-                  className="btn-primary"
-                >
-                  Process Another Video
-                </button>
-                <div className="flex items-center space-x-2 text-gray-500">
-                  <span>or</span>
-                  <ArrowRightIcon className="w-4 h-4" />
-                  <span>Check your library</span>
-                </div>
-              </div>
-            </div>
-          </div>
+
         </div>
       )}
     </div>
