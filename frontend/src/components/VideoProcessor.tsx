@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PlayIcon, XMarkIcon, VideoCameraIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
+import { PlayIcon, XMarkIcon, VideoCameraIcon } from '@heroicons/react/24/outline';
 import Logo from './Logo';
 import { useVideoProcessing } from '../hooks/useVideoProcessing';
 import { isValidYouTubeUrl } from '../utils/validation';
